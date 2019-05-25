@@ -80,9 +80,16 @@ public abstract class BeanFactoryUtils {
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
+		// 不是以& 开头  直接返回，否则去掉&返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
+		/**
+		 * computeIfAbsent：
+		 * java8 Map新增的方法  判断Map中是否存在指定key的值，存在直接返回
+		 * 否则 自动调用mappingFunction(key)计算key的value，
+		 * 然后将key = value放入到缓存Map,java8会使用thread-safe的方式从cache中存取记录。
+		 */
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());

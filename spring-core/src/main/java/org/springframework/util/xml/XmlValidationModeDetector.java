@@ -94,14 +94,17 @@ public class XmlValidationModeDetector {
 			boolean isDtdValidated = false;
 			String content;
 			while ((content = reader.readLine()) != null) {
+				// 去掉注释
 				content = consumeCommentTokens(content);
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 含有DOCTYPE的为dtd验证
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// 以< 开头，而且接下来的字符为字母  就不采用dtd验证
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
@@ -138,6 +141,7 @@ public class XmlValidationModeDetector {
 		}
 		int openTagIndex = content.indexOf('<');
 		return (openTagIndex > -1 && (content.length() > openTagIndex + 1) &&
+				// 判断指定字符是否为字母
 				Character.isLetter(content.charAt(openTagIndex + 1)));
 	}
 

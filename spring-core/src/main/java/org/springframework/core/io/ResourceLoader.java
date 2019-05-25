@@ -20,6 +20,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ResourceUtils;
 
 /**
+ * ResourceLoader接口用于实现不同的Resource加载策略，即将不同Resource实例的创建交给ResourceLoader来计算
+ *
  * Strategy interface for loading resources (e.. class path or file system
  * resources). An {@link org.springframework.context.ApplicationContext}
  * is required to provide this functionality, plus extended
@@ -63,6 +65,12 @@ public interface ResourceLoader {
 	 * @see #CLASSPATH_URL_PREFIX
 	 * @see Resource#exists()
 	 * @see Resource#getInputStream()
+	 */
+
+	/**
+	 * 根据指定的路径，加载Resource
+	 * @param location
+	 * @return
 	 */
 	Resource getResource(String location);
 

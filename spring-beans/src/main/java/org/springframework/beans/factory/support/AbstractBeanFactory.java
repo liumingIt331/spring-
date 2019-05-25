@@ -239,18 +239,27 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
+		/**
+		 * 将name转换成为一个标准的beanName
+		 * 1.去除FacoryBean的前缀&
+		 * 2.如果name是别名，则从aliasMap中去找到标准的beanName
+		 */
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 先从缓存中取是否有手动创建过的 单例Bean
+		// 保证单例模式下  容器中有且仅有一个bean实例
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
+					// 该bean实例还没有被完全初始化
 					logger.trace("Returning eagerly cached instance of singleton bean '" + beanName +
 							"' that is not fully initialized yet - a consequence of a circular reference");
 				}
 				else {
+					// 缓存中存在已经完全实例化的单例bean
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}

@@ -71,15 +71,22 @@ import org.springframework.util.StringUtils;
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Cache of singleton objects: bean name to bean instance. */
+	// 用于保存beanName和bean实例之间的关系
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/** Cache of singleton factories: bean name to ObjectFactory. */
+	// 用于保存beanName和创建bean的工厂之间的关系
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. */
+	/**
+	 * 保存BeanName和创建bean实例之间的关系，与singletonObjects的不同在于，
+	 * 当一个单例bean被放到这里面后，name当bean还在创建过程中，就可以通过getBean方法获取到了，其目的是用来检测循环引用。
+	 */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
+	// 用来保存当前所有已注册的单例bean
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	/** Names of beans that are currently in creation. */
@@ -174,6 +181,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		/**
+		 * 先尝试从SingletonObjects缓存中加载实例；如果不成功则尝试从earlySingletonObjects中加载已经在创建完成之前提前暴露的单例Bean；
+		 * 如果失败了，则从singletonFactories中获取beanName对应的ObjectFactory，
+		 * 然后在调用ObjectFactory#getObject()方法创建对应的Bean，并放到earlySingletonObjects中，
+		 * 并从SingletonFactories中remove掉这个ObjectFactory。
+		 * 而对于后续的所有操作都只是为了循环依赖检测时候使用，也就是allowEarlyReference为true的情况下才使用。
+		 */
+
+		/**
+		 * 为了解决循环依赖的问题，Spring中创建bean的原则是不等bean创建完成就会将创建bean的ObjectFactory提前曝光加入到缓存中，
+		 * 一旦下一个Bean创建时需要依赖上一个bean则直接使用ObjectFactory。
+		 */
 		Object singletonObject = this.singletonObjects.get(beanName);
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {

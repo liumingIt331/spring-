@@ -22,6 +22,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
+ *	多个资源匹配这种模式：
+ * ResourcePatternResolver定义了getResources()方法用于根据传入的locationPattern查找和其匹配的Resource实例，
+ * 并以数组的形式返回，在返回的数组中不可以存在相同的Resource实例。ResourcePatternResolver中还定义了”classpath*:”模式，
+ * 用于表示查找classpath下所有的匹配Resource。
+ *
  * Strategy interface for resolving a location pattern (for example,
  * an Ant-style path pattern) into Resource objects.
  *

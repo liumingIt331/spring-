@@ -128,13 +128,17 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		BeanDefinitionParserDelegate parent = this.delegate;
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
+		// isDefaultNamespace 默认的命名空间比如：bean标签，alias标签和import标签
 		if (this.delegate.isDefaultNamespace(root)) {
+			// 获取profile的值
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 				// We cannot use Profiles.of(...) since profile expressions are not supported
 				// in XML config. See SPR-12458 for details.
+
+				// 与当前系统环境设置的profile值进行匹配，决定是否要解析该xml配置文件
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec +
@@ -145,6 +149,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 
+		/**
+		 * preProcessXml、postProcessXml两个方法用于扩展，解析BeanDefinition
+		 * 前置、后置处理，目前为空方法
+		 */
 		preProcessXml(root);
 		parseBeanDefinitions(root, this.delegate);
 		postProcessXml(root);
@@ -166,7 +174,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-		// 只有http://www.springframework.org/schema/beans，会被认为是默认的命名空间比如：bean标签，alias标签和import标签。
+		// 默认的命名空间比如：bean标签，alias标签和import标签。
 		// 而像task:scheduled、tx:annotation这些，就认为不属于默认命名空间
 		if (delegate.isDefaultNamespace(root)) {
 			NodeList nl = root.getChildNodes();

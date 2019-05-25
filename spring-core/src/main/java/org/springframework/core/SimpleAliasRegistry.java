@@ -52,12 +52,18 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
 		synchronized (this.aliasMap) {
+			/**
+			 * 1.alias与beanName不同的情况下，才需要注册
+			 * 2.aliasMap中，alias为key  beanName为value
+			 */
+			// 别名与标准beanName相同
 			if (alias.equals(name)) {
 				this.aliasMap.remove(alias);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Alias definition '" + alias + "' ignored since it points to same name");
 				}
 			}
+			// 不同
 			else {
 				String registeredName = this.aliasMap.get(alias);
 				if (registeredName != null) {
@@ -100,8 +106,10 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	public boolean hasAlias(String name, String alias) {
 		for (Map.Entry<String, String> entry : this.aliasMap.entrySet()) {
 			String registeredName = entry.getValue();
+			// 给定的name在aliasMap中已经存在
 			if (registeredName.equals(name)) {
 				String registeredAlias = entry.getKey();
+				//已经注册过的alias与配置的alias相同
 				if (registeredAlias.equals(alias) || hasAlias(registeredAlias, alias)) {
 					return true;
 				}
@@ -216,6 +224,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		// Handle aliasing...
 		String resolvedName;
 		do {
+			// 从加载BeanDefinition时 生成的aliasMap中获取别名
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {
 				canonicalName = resolvedName;

@@ -76,6 +76,9 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		/**
+		 * 在BeanDefinition加载完毕后  Bean初始化之前调用 修改Bean上下文属性
+		 */
 		try {
 			Properties mergedProps = mergeProperties();
 
