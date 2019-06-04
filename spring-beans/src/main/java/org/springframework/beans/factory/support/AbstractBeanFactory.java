@@ -248,7 +248,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		// 先从缓存中取是否有手动创建过的 单例Bean
+		// 先从缓存中取是否有创建过的 单例Bean 正常情况下是取不到的
 		// 保证单例模式下  容器中有且仅有一个bean实例
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
@@ -274,6 +274,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			// Check if bean definition exists in this factory.
+
+			/**
+			 * 根据当前的beanfactory获取父一级的beanfactory，
+			 * 然后逐级递归的查找我们需要的bean，很显然在这里依然获取不到我们的bean，原因同第一部分
+			 */
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
@@ -295,6 +300,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 
+			// 标记为正在创建
 			if (!typeCheckOnly) {
 				markBeanAsCreated(beanName);
 			}
@@ -304,6 +310,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
+
+				// 把BeanDefinition里存储的依赖bean挨个取出来进行实例化
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {
@@ -313,6 +321,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						}
 						registerDependentBean(dep, beanName);
 						try {
+							// 实例化依赖Bean
 							getBean(dep);
 						}
 						catch (NoSuchBeanDefinitionException ex) {

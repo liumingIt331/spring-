@@ -197,11 +197,14 @@ final class PostProcessorRegistrationDelegate {
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
+		// 获取beanFactory里继承了BeanPostProcessor接口的name的集合；
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
 		// a bean is created during BeanPostProcessor instantiation, i.e. when
 		// a bean is not eligible for getting processed by all BeanPostProcessors.
+
+		// 注册一个BeanPostProcessorChecker，用来记录bean在BeanPostProcessor实例化时的信息。
 		int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
@@ -260,6 +263,11 @@ final class PostProcessorRegistrationDelegate {
 
 		// Re-register post-processor for detecting inner beans as ApplicationListeners,
 		// moving it to the end of the processor chain (for picking up proxies etc).
+		/**
+		 * ApplicationListenerDetector:
+		 * 该BeanPostProcessor检测那些实现了接口ApplicationListener的bean，在它们创建时初始化之后，
+		 * 将它们添加到应用上下文的事件多播器上；并在这些ApplicationListener bean销毁之前，将它们从应用上下文的事件多播器上移除。
+		 */
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
 	}
 

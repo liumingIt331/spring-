@@ -390,6 +390,7 @@ class ConstructorResolver {
 						"factory-bean reference points back to the same bean definition");
 			}
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
+			// 已经创建过单例Bean
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
@@ -409,6 +410,7 @@ class ConstructorResolver {
 
 		Method factoryMethodToUse = null;
 		ArgumentsHolder argsHolderToUse = null;
+		// 构造参数
 		Object[] argsToUse = null;
 
 		if (explicitArgs != null) {
