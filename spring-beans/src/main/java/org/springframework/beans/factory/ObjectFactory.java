@@ -36,6 +36,11 @@ import org.springframework.beans.BeansException;
  * @param <T> the object type
  * @see FactoryBean
  */
+
+/**
+ * FunctionalInterface-->函数式接口声明:这种接口允许有且只有一个方法
+ * @param <T>
+ */
 @FunctionalInterface
 public interface ObjectFactory<T> {
 
